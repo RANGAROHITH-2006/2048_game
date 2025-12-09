@@ -14,7 +14,7 @@ class Game2048App extends StatelessWidget {
       title: '2048 Game',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        scaffoldBackgroundColor: Colors.white.withOpacity(0.5),
+        // scaffoldBackgroundColor: Colors.white.withOpacity(0.5),
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF3B82F6)),
         useMaterial3: true,
       ),

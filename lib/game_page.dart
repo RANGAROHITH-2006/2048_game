@@ -38,7 +38,6 @@ class _GamePageState extends State<GamePage> {
     // Check for win condition
     if (_gameState.won && !_hasShownWinDialog) {
       _hasShownWinDialog = true;
-      print('DEBUG: Win condition detected, showing win dialog');
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
           _showWinDialog();
@@ -49,7 +48,6 @@ class _GamePageState extends State<GamePage> {
     // Check for game over condition
     if (_gameState.gameOver && !_hasShownGameOverDialog) {
       _hasShownGameOverDialog = true;
-      print('DEBUG: Game over detected, showing game over dialog');
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
           _showGameOverDialog();
@@ -109,25 +107,19 @@ class _GamePageState extends State<GamePage> {
     final double dy = _swipeEnd!.dy - _swipeStart!.dy;
     final double threshold = 20.0; // Minimum swipe distance in pixels
 
-    print('DEBUG: Swipe distance - dx: $dx, dy: $dy');
-
     // Determine swipe direction based on the larger delta
     if (dx.abs() > dy.abs() && dx.abs() > threshold) {
       // Horizontal swipe
       if (dx > 0) {
-        print('DEBUG: Swiping RIGHT');
         _gameState.move(MoveDirection.right);
       } else {
-        print('DEBUG: Swiping LEFT');
         _gameState.move(MoveDirection.left);
       }
     } else if (dy.abs() > dx.abs() && dy.abs() > threshold) {
       // Vertical swipe
       if (dy > 0) {
-        print('DEBUG: Swiping DOWN');
         _gameState.move(MoveDirection.down);
       } else {
-        print('DEBUG: Swiping UP');
         _gameState.move(MoveDirection.up);
       }
     }
@@ -247,52 +239,60 @@ class _GamePageState extends State<GamePage> {
           ],
         ),
         actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              setState(() {
-                _gameState.continueAfterWin();
-                _hasShownWinDialog = false;
-              });
-              _focusNode.requestFocus();
-            },
-            style: TextButton.styleFrom(
-              backgroundColor: const Color(0xFF3B82F6),
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+          Row(
+            children: [
+              Expanded(
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    setState(() {
+                      _gameState.continueAfterWin();
+                      _hasShownWinDialog = false;
+                  });
+                  _focusNode.requestFocus();
+                },
+                style: TextButton.styleFrom(
+                  backgroundColor: const Color(0xFF3B82F6),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: const Text(
+                  'Continue',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+              )),
+              const SizedBox(width: 8),
+          Expanded(
+            child: TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                setState(() {
+                  _gameState.resetGame();
+                  _hasShownWinDialog = false;
+                  _hasShownGameOverDialog = false;
+                });
+                _focusNode.requestFocus();
+              },
+              style: TextButton.styleFrom(
+                backgroundColor: const Color(0xFF3B82F6),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: const Text(
+                'New Game',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
             ),
-            child: const Text(
-              'Continue',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            ),
           ),
-          const SizedBox(width: 8),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              setState(() {
-                _gameState.resetGame();
-                _hasShownWinDialog = false;
-                _hasShownGameOverDialog = false;
-              });
-              _focusNode.requestFocus();
-            },
-            style: TextButton.styleFrom(
-              backgroundColor: const Color(0xFF3B82F6),
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            child: const Text(
-              'New Game',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            ),
+            ],
           ),
+          
         ],
       ),
     );
@@ -451,7 +451,7 @@ class _GamePageState extends State<GamePage> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               decoration: BoxDecoration(
-                color: const Color(0xFF2d3748),
+                color: const Color(0xFF2d3748).withOpacity(0.6),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: const Color(0xFF4a5568),
@@ -491,7 +491,7 @@ class _GamePageState extends State<GamePage> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               decoration: BoxDecoration(
-                color: const Color(0xFF2d3748),
+                color: const Color(0xFF2d3748).withOpacity(0.6),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: const Color(0xFF4a5568),

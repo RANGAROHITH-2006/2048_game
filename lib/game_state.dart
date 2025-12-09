@@ -84,23 +84,13 @@ class GameState extends ChangeNotifier {
   void move(MoveDirection direction) {
     if (_gameOver) return;
 
-    print('\n========== MOVE START ==========');
-    print('Direction: $direction');
-    print('Board BEFORE move:');
-    _printBoard(_board);
-
     // Execute the move
     Map<String, dynamic>? result = GameLogic.executeMove(_board, direction);
 
     // If the move didn't change the board, do nothing
     if (result == null) {
-      print('❌ No tiles moved - invalid move');
-      print('========== MOVE END ==========\n');
       return;
     }
-
-    print('✓ Tiles moved successfully');
-    print('Score gained: ${result['score']}');
 
     // Save current state for undo (only one step)
     _previousBoard = _board.map((row) => List<int>.from(row)).toList();
@@ -117,38 +107,21 @@ class GameState extends ChangeNotifier {
       _saveHighScore();
     }
 
-    print('Board AFTER move (before new tile):');
-    _printBoard(_board);
-
     // Add a new random tile
     _board = GameLogic.addRandomTile(_board);
-
-    print('Board AFTER adding new tile:');
-    _printBoard(_board);
-    print('Total Score: $_score');
 
     // Check for win condition (2048 tile)
     if (!_won && _hasWinningTile()) {
       _won = true;
-      print('🎉 WIN CONDITION ACHIEVED!');
     }
 
     // Check if the game is over
     bool canStillMove = GameLogic.canMove(_board);
     if (!canStillMove) {
       _gameOver = true;
-      print('💀 GAME OVER - No more moves available!');
     }
 
-    print('========== MOVE END ==========\n');
     notifyListeners();
-  }
-
-  /// Helper method to print board state
-  void _printBoard(List<List<int>> board) {
-    for (var row in board) {
-      print('  ${row.map((v) => v.toString().padLeft(4)).join(' | ')}');
-    }
   }
 
   /// Check if there's a 2048 tile on the board
