@@ -10,6 +10,7 @@ class GameState extends ChangeNotifier {
   int _highScore = 0;
   bool _gameOver = false;
   bool _won = false;
+  bool _hasShownWinDialog = false; // Track if win dialog has been shown
 
   // Undo functionality - store only one previous state
   List<List<int>>? _previousBoard;
@@ -88,6 +89,7 @@ class GameState extends ChangeNotifier {
         _score = savedScore;
         _gameOver = false;
         _won = false;
+        _hasShownWinDialog = false;
         _previousBoard = null;
         _previousScore = null;
         _canUndo = false;
@@ -119,6 +121,7 @@ class GameState extends ChangeNotifier {
     _score = 0;
     _gameOver = false;
     _won = false;
+    _hasShownWinDialog = false;
     _previousBoard = null;
     _previousScore = null;
     _canUndo = false;
@@ -138,6 +141,7 @@ class GameState extends ChangeNotifier {
       _score = _previousScore!;
       _gameOver = false;
       _won = false;
+      _hasShownWinDialog = false;
       _previousBoard = null;
       _previousScore = null;
       _canUndo = false;
@@ -176,8 +180,9 @@ class GameState extends ChangeNotifier {
     _board = GameLogic.addRandomTile(_board);
 
     // Check for win condition (2048 tile)
-    if (!_won && _hasWinningTile()) {
+    if (!_hasShownWinDialog && _hasWinningTile()) {
       _won = true;
+      _hasShownWinDialog = true;
     }
 
     // Check if the game is over
@@ -195,7 +200,7 @@ class GameState extends ChangeNotifier {
   /// Check if there's a 2048 tile on the board
   bool _hasWinningTile() {
     for (var row in _board) {
-      if (row.contains(32)) {
+      if (row.contains(2048)) {
         return true;
       }
     }
