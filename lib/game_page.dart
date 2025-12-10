@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'game_state.dart';
 import 'game_logic.dart';
 import 'tile_widget.dart';
-import 'help_diolog.dart';
+import 'game_dialogs.dart';
 
 /// Main game page with UI and input handling
 class GamePage extends StatefulWidget {
@@ -27,10 +27,18 @@ class _GamePageState extends State<GamePage> {
     // Listen to game state changes
     _gameState.addListener(_onGameStateChanged);
 
+    // Try to load saved game state
+    _loadSavedGame();
+
     // Request focus for keyboard input
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _focusNode.requestFocus();
     });
+  }
+
+  /// Load saved game if available
+  Future<void> _loadSavedGame() async {
+    await _gameState.loadGameState();
   }
 
   /// Handle game state changes
@@ -130,196 +138,38 @@ class _GamePageState extends State<GamePage> {
 
   /// Show game over dialog
   void _showGameOverDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder:
-          (context) => AlertDialog(
-            backgroundColor: const Color(0xFF1a1a2e),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-              side: BorderSide(color: Colors.white.withOpacity(0.2), width: 2),
-            ),
-            title: const Text(
-              '😞 Game Over!',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 30,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment:
-                  CrossAxisAlignment.center, // ⬅️ Center content
-              children: [
-                const Text(
-                  'No more moves available!',
-                  textAlign: TextAlign.center, // ⬅️ Center text
-                  style: TextStyle(fontSize: 18, color: Colors.white70),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  'Final Score: ${_gameState.score}',
-                  textAlign: TextAlign.center, // ⬅️ Center text
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
-            ),
-            actions: [
-              Center(
-                // ⬅️ Center the button horizontally
-                child: TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    setState(() {
-                      _gameState.resetGame();
-                      _hasShownGameOverDialog = false;
-                    });
-                    _focusNode.requestFocus();
-                  },
-                  style: TextButton.styleFrom(
-                    backgroundColor: const Color(0xFF3B82F6),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 12,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: const Text(
-                    'Try Again',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                ),
-              ),
-            ],
-          ),
-    );
+    showGameOverDialog(context, _gameState.score, () {
+      Navigator.pop(context);
+      setState(() {
+        _gameState.resetGame();
+        _hasShownGameOverDialog = false;
+      });
+      _focusNode.requestFocus();
+    });
   }
 
   /// Show win dialog
   void _showWinDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder:
-          (context) => AlertDialog(
-            backgroundColor: const Color(0xFF1a1a2e),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-              side: BorderSide(color: Colors.white.withOpacity(0.2), width: 2),
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Image.asset('assets/images/win.png', width: 120, height: 120),
-
-                Text(
-                  '🎉 You Win! 🎉',
-                  style: TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  'You reached 2048!',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white70,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Score: ${_gameState.score}',
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
-            ),
-            actions: [
-              Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                        setState(() {
-                          _gameState.continueAfterWin();
-                          _hasShownWinDialog = false;
-                        });
-                        _focusNode.requestFocus();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blueGrey.withOpacity(0.7),
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 12,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: const Text(
-                        'Continue',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                        setState(() {
-                          _gameState.resetGame();
-                          _hasShownWinDialog = false;
-                          _hasShownGameOverDialog = false;
-                        });
-                        _focusNode.requestFocus();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF3B82F6),
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 12,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: const Text(
-                        'New Game',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
+    showWinDialog(
+      context,
+      _gameState.score,
+      () {
+        Navigator.pop(context);
+        setState(() {
+          _gameState.continueAfterWin();
+          _hasShownWinDialog = false;
+        });
+        _focusNode.requestFocus();
+      },
+      () {
+        Navigator.pop(context);
+        setState(() {
+          _gameState.resetGame();
+          _hasShownWinDialog = false;
+          _hasShownGameOverDialog = false;
+        });
+        _focusNode.requestFocus();
+      },
     );
   }
 
@@ -350,10 +200,13 @@ class _GamePageState extends State<GamePage> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          // Pause button
+                          // Home button
                           GestureDetector(
                             onTap: () {
-                              Navigator.pop(context);
+                              showHomeConfirmationDialog(context, () {
+                                _gameState.saveGameState();
+                                Navigator.pop(context);
+                              });
                             },
                             child: Container(
                               width: 36,
@@ -592,12 +445,14 @@ class _GamePageState extends State<GamePage> {
         _buildCircularButton(
           icon: Icons.refresh,
           onPressed: () {
-            setState(() {
-              _gameState.resetGame();
-              _hasShownGameOverDialog = false;
-              _hasShownWinDialog = false;
+            showRestartConfirmationDialog(context, () {
+              setState(() {
+                _gameState.resetGame();
+                _hasShownGameOverDialog = false;
+                _hasShownWinDialog = false;
+              });
+              _focusNode.requestFocus();
             });
-            _focusNode.requestFocus();
           },
         ),
         const SizedBox(width: 20),

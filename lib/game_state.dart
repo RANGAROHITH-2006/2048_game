@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'game_logic.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -9,7 +10,7 @@ class GameState extends ChangeNotifier {
   int _highScore = 0;
   bool _gameOver = false;
   bool _won = false;
-  
+
   // Undo functionality - store only one previous state
   List<List<int>>? _previousBoard;
   int? _previousScore;
@@ -49,6 +50,69 @@ class GameState extends ChangeNotifier {
     }
   }
 
+  /// Save current game state to local storage
+  Future<void> saveGameState() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+
+      // Only save if game is in progress (not finished)
+      if (!_gameOver && !_won) {
+        await prefs.setString('savedBoard', jsonEncode(_board));
+        await prefs.setInt('savedScore', _score);
+        await prefs.setBool('gameInProgress', true);
+      } else {
+        // Clear saved game if game is finished
+        await clearSavedGame();
+      }
+    } catch (e) {
+      print('Error saving game state: $e');
+    }
+  }
+
+  /// Load saved game state from local storage
+  Future<bool> loadGameState() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final gameInProgress = prefs.getBool('gameInProgress') ?? false;
+
+      if (!gameInProgress) {
+        return false;
+      }
+
+      final savedBoardJson = prefs.getString('savedBoard');
+      final savedScore = prefs.getInt('savedScore');
+
+      if (savedBoardJson != null && savedScore != null) {
+        final decoded = jsonDecode(savedBoardJson) as List;
+        _board = decoded.map((row) => List<int>.from(row)).toList();
+        _score = savedScore;
+        _gameOver = false;
+        _won = false;
+        _previousBoard = null;
+        _previousScore = null;
+        _canUndo = false;
+        notifyListeners();
+        return true;
+      }
+      return false;
+    } catch (e) {
+      print('Error loading game state: $e');
+      return false;
+    }
+  }
+
+  /// Clear saved game from local storage
+  Future<void> clearSavedGame() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('savedBoard');
+      await prefs.remove('savedScore');
+      await prefs.setBool('gameInProgress', false);
+    } catch (e) {
+      print('Error clearing saved game: $e');
+    }
+  }
+
   /// Initialize a new game
   void _initializeGame() {
     _board = GameLogic.initializeBoard();
@@ -64,6 +128,7 @@ class GameState extends ChangeNotifier {
   /// Reset the game
   void resetGame() {
     _initializeGame();
+    clearSavedGame();
   }
 
   /// Undo the last move (only one step)
@@ -100,7 +165,7 @@ class GameState extends ChangeNotifier {
     // Update the board and score
     _board = result['board'];
     _score += result['score'] as int;
-    
+
     // Update high score if needed
     if (_score > _highScore) {
       _highScore = _score;
@@ -121,13 +186,16 @@ class GameState extends ChangeNotifier {
       _gameOver = true;
     }
 
+    // Save game state after every move
+    saveGameState();
+
     notifyListeners();
   }
 
   /// Check if there's a 2048 tile on the board
   bool _hasWinningTile() {
     for (var row in _board) {
-      if (row.contains(256)) {
+      if (row.contains(32)) {
         return true;
       }
     }

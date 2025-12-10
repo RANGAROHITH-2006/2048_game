@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:game_2048/game_page.dart';
-import 'package:game_2048/help_diolog.dart';
+import 'package:game_2048/game_dialogs.dart';
 import 'package:share_plus/share_plus.dart';
 
 class HomeScreen extends StatefulWidget {
