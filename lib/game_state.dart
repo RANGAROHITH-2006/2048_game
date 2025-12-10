@@ -127,7 +127,7 @@ class GameState extends ChangeNotifier {
   /// Check if there's a 2048 tile on the board
   bool _hasWinningTile() {
     for (var row in _board) {
-      if (row.contains(2048)) {
+      if (row.contains(256)) {
         return true;
       }
     }

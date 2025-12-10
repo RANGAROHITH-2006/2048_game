@@ -23,16 +23,16 @@ class _GamePageState extends State<GamePage> {
   void initState() {
     super.initState();
     _gameState = GameState();
-    
+
     // Listen to game state changes
     _gameState.addListener(_onGameStateChanged);
-    
+
     // Request focus for keyboard input
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _focusNode.requestFocus();
     });
   }
-  
+
   /// Handle game state changes
   void _onGameStateChanged() {
     // Check for win condition
@@ -44,7 +44,7 @@ class _GamePageState extends State<GamePage> {
         }
       });
     }
-    
+
     // Check for game over condition
     if (_gameState.gameOver && !_hasShownGameOverDialog) {
       _hasShownGameOverDialog = true;
@@ -133,66 +133,75 @@ class _GamePageState extends State<GamePage> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1a1a2e),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: BorderSide(color: Colors.white.withOpacity(0.2), width: 2),
-        ),
-        title: const Text(
-          'Game Over!',
-          style: TextStyle(
-            fontSize: 28,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-              'No more moves available!',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.white70,
-              ),
+      builder:
+          (context) => AlertDialog(
+            backgroundColor: const Color(0xFF1a1a2e),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+              side: BorderSide(color: Colors.white.withOpacity(0.2), width: 2),
             ),
-            const SizedBox(height: 12),
-            Text(
-              'Final Score: ${_gameState.score}',
-              style: const TextStyle(
-                fontSize: 24,
+            title: const Text(
+              '😞 Game Over!',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 30,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
             ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              setState(() {
-                _gameState.resetGame();
-                _hasShownGameOverDialog = false;
-              });
-              _focusNode.requestFocus();
-            },
-            style: TextButton.styleFrom(
-              backgroundColor: const Color(0xFF3B82F6),
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment:
+                  CrossAxisAlignment.center, // ⬅️ Center content
+              children: [
+                const Text(
+                  'No more moves available!',
+                  textAlign: TextAlign.center, // ⬅️ Center text
+                  style: TextStyle(fontSize: 18, color: Colors.white70),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Final Score: ${_gameState.score}',
+                  textAlign: TextAlign.center, // ⬅️ Center text
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              Center(
+                // ⬅️ Center the button horizontally
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    setState(() {
+                      _gameState.resetGame();
+                      _hasShownGameOverDialog = false;
+                    });
+                    _focusNode.requestFocus();
+                  },
+                  style: TextButton.styleFrom(
+                    backgroundColor: const Color(0xFF3B82F6),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 12,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: const Text(
+                    'Try Again',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                ),
               ),
-            ),
-            child: const Text(
-              'Try Again',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
@@ -201,100 +210,116 @@ class _GamePageState extends State<GamePage> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1a1a2e),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: BorderSide(color: Colors.white.withOpacity(0.2), width: 2),
-        ),
-        title: const Text(
-          '🎉 You Win! 🎉',
-          style: TextStyle(
-            fontSize: 28,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-              'You reached 2048!',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.white70,
-              ),
+      builder:
+          (context) => AlertDialog(
+            backgroundColor: const Color(0xFF1a1a2e),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+              side: BorderSide(color: Colors.white.withOpacity(0.2), width: 2),
             ),
-            const SizedBox(height: 12),
-            Text(
-              'Score: ${_gameState.score}',
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          Row(
-            children: [
-              Expanded(
-                child: TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    setState(() {
-                      _gameState.continueAfterWin();
-                      _hasShownWinDialog = false;
-                  });
-                  _focusNode.requestFocus();
-                },
-                style: TextButton.styleFrom(
-                  backgroundColor: const Color(0xFF3B82F6),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Image.asset('assets/images/win.png', width: 120, height: 120),
+
+                Text(
+                  '🎉 You Win! 🎉',
+                  style: TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'You reached 2048!',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white70,
                   ),
                 ),
-                child: const Text(
-                  'Continue',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                const SizedBox(height: 8),
+                Text(
+                  'Score: ${_gameState.score}',
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
-              )),
-              const SizedBox(width: 8),
-          Expanded(
-            child: TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                setState(() {
-                  _gameState.resetGame();
-                  _hasShownWinDialog = false;
-                  _hasShownGameOverDialog = false;
-                });
-                _focusNode.requestFocus();
-              },
-              style: TextButton.styleFrom(
-                backgroundColor: const Color(0xFF3B82F6),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: const Text(
-                'New Game',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-              ),
+              ],
             ),
-          ),
+            actions: [
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        setState(() {
+                          _gameState.continueAfterWin();
+                          _hasShownWinDialog = false;
+                        });
+                        _focusNode.requestFocus();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blueGrey.withOpacity(0.7),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: const Text(
+                        'Continue',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        setState(() {
+                          _gameState.resetGame();
+                          _hasShownWinDialog = false;
+                          _hasShownGameOverDialog = false;
+                        });
+                        _focusNode.requestFocus();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF3B82F6),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: const Text(
+                        'New Game',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
-          
-        ],
-      ),
     );
   }
 
@@ -397,16 +422,16 @@ class _GamePageState extends State<GamePage> {
                             children: [
                               // Title and score header
                               _buildHeader(),
-                        const SizedBox(height: 60),
-                        // Game board
-                        _buildGameBoard(),
-                        const SizedBox(height: 30),
-                        // Action buttons
-                        _buildActionButtons(),
-                      ],
-                    ),
-                  ),
-                ),
+                              const SizedBox(height: 60),
+                              // Game board
+                              _buildGameBoard(),
+                              const SizedBox(height: 30),
+                              // Action buttons
+                              _buildActionButtons(),
+                            ],
+                          ),
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -420,13 +445,12 @@ class _GamePageState extends State<GamePage> {
 
   /// Build the decorative background
   Widget _buildBackground() {
-    return 
-    Image.asset(
-        'assets/images/background.png',
-        fit: BoxFit.cover,
-        width: double.infinity,
-        height: double.infinity,
-      );
+    return Image.asset(
+      'assets/images/background.png',
+      fit: BoxFit.cover,
+      width: double.infinity,
+      height: double.infinity,
+    );
   }
 
   /// Build the header with title, score, and new game button
@@ -453,10 +477,7 @@ class _GamePageState extends State<GamePage> {
               decoration: BoxDecoration(
                 color: const Color(0xFF2d3748).withOpacity(0.6),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: const Color(0xFF4a5568),
-                  width: 1,
-                ),
+                border: Border.all(color: const Color(0xFF4a5568), width: 1),
               ),
               child: Column(
                 children: [
@@ -493,10 +514,7 @@ class _GamePageState extends State<GamePage> {
               decoration: BoxDecoration(
                 color: const Color(0xFF2d3748).withOpacity(0.6),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: const Color(0xFF4a5568),
-                  width: 1,
-                ),
+                border: Border.all(color: const Color(0xFF4a5568), width: 1),
               ),
               child: Column(
                 children: [
@@ -538,14 +556,11 @@ class _GamePageState extends State<GamePage> {
       listenable: _gameState,
       builder: (context, child) {
         return Container(
-          padding: const EdgeInsets.all(12.0),
+          padding: const EdgeInsets.all(8.0),
           decoration: BoxDecoration(
-            color: Colors.transparent,
+            color: Colors.white.withOpacity(0.1),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: Colors.white.withOpacity(0.2),
-              width: 2,
-            ),
+            border: Border.all(color: Colors.white.withOpacity(0.2), width: 2),
           ),
           child: Column(
             children: List.generate(4, (row) {
@@ -557,10 +572,7 @@ class _GamePageState extends State<GamePage> {
                     final value = _gameState.getTileValue(row, col);
                     return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                      child: TileWidget(
-                        value: value,
-                        size: 65.0,
-                      ),
+                      child: TileWidget(value: value, size: 65.0),
                     );
                   }),
                 ),
@@ -594,16 +606,17 @@ class _GamePageState extends State<GamePage> {
           builder: (context, child) {
             return _buildCircularButton(
               icon: Icons.undo,
-              onPressed: _gameState.canUndo
-                  ? () {
-                      setState(() {
-                        _gameState.undo();
-                        _hasShownGameOverDialog = false;
-                        _hasShownWinDialog = false;
-                      });
-                      _focusNode.requestFocus();
-                    }
-                  : null,
+              onPressed:
+                  _gameState.canUndo
+                      ? () {
+                        setState(() {
+                          _gameState.undo();
+                          _hasShownGameOverDialog = false;
+                          _hasShownWinDialog = false;
+                        });
+                        _focusNode.requestFocus();
+                      }
+                      : null,
             );
           },
         ),
@@ -612,25 +625,35 @@ class _GamePageState extends State<GamePage> {
   }
 
   /// Build circular button
-  Widget _buildCircularButton({required IconData icon, required VoidCallback? onPressed}) {
+  Widget _buildCircularButton({
+    required IconData icon,
+    required VoidCallback? onPressed,
+  }) {
     final isEnabled = onPressed != null;
     return Container(
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: isEnabled ? const Color(0xFF2d3748) : const Color(0xFF2d3748).withOpacity(0.5),
+        color:
+            isEnabled
+                ? const Color(0xFF2d3748)
+                : const Color(0xFF2d3748).withOpacity(0.5),
         border: Border.all(
-          color: isEnabled ? const Color(0xFF4a5568) : const Color(0xFF4a5568).withOpacity(0.5),
+          color:
+              isEnabled
+                  ? const Color(0xFF4a5568)
+                  : const Color(0xFF4a5568).withOpacity(0.5),
           width: 2,
         ),
-        boxShadow: isEnabled
-            ? [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.3),
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
-                ),
-              ]
-            : [],
+        boxShadow:
+            isEnabled
+                ? [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
+                : [],
       ),
       child: Material(
         color: Colors.transparent,

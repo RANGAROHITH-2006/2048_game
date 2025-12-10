@@ -15,7 +15,7 @@ class TileWidget extends StatelessWidget {
   Color _getBackgroundColor() {
     switch (value) {
       case 0:
-        return const Color(0xFFFFFFFF).withOpacity(0.5);
+        return const Color(0x86808C).withOpacity(0.3);
       case 2:
         return const Color(0xFF4a5568);
       case 4:
@@ -76,7 +76,7 @@ class TileWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(12.0),
         border: value != 0
             ? Border.all(
-                color: Colors.white.withOpacity(0.1),
+                color: Colors.white.withOpacity(0.2),
                 width: 1,
               )
             : null,
